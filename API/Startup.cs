@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+//using API.Extensions;
 using Application.Activities;
+using Application.Utilities;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,8 +36,12 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
+
+            //to clean this up a bit, we could use an Extension method (API > Extensions > ApplicationServiceExtensions)
+            //we would replace everything below here (not the services.AddControllers()!) with:
+            //services.AddApplicationServices(_config);
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
@@ -59,6 +65,7 @@ namespace API
             //once we get to production, the client-app and API will be on the same domain, so we won't need it
 
             services.AddMediatR(typeof(List.Handler).Assembly); //tells our app to use MediatR, and the rest tells MediatR where to find our handlers
+            services.AddAutoMapper(typeof(MappingProfiles).Assembly); //a utility we can use to map properties from one object to another object
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
