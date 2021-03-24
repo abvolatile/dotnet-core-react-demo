@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Activities;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -55,6 +57,8 @@ namespace API
                 });
             }); // this is so we can tell Cors we know it's ok to pass data back and forth in different localhost ports
             //once we get to production, the client-app and API will be on the same domain, so we won't need it
+
+            services.AddMediatR(typeof(List.Handler).Assembly); //tells our app to use MediatR, and the rest tells MediatR where to find our handlers
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
