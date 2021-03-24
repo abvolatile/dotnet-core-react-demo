@@ -39,12 +39,22 @@ namespace API
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
                 //this is for API testing (like Postman) -> go to your <applicationUrl>/swagger/index.html
             });
+
             services.AddDbContext<DataContext>(opt =>
             {
                 opt.UseSqlite(_config.GetConnectionString("DefaultConnection"));
                 //this connection string is configured in appsettings.Development.json:
                 //"ConnectionStrings": { "DefaultConnection": "Data source=reactivities.db" }
             });
+
+            services.AddCors(opt =>
+            {
+                opt.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
+                });
+            }); // this is so we can tell Cors we know it's ok to pass data back and forth in different localhost ports
+            //once we get to production, the client-app and API will be on the same domain, so we won't need it
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +70,8 @@ namespace API
             //app.UseHttpsRedirection();  //commented out because we decided not to use https -> launchSettings.json > API > applicationUrl (changed from "https://localhost:5001;http://localhost:5000" to just "http://localhost:5000")
 
             app.UseRouting();
+
+            app.UseCors("CorsPolicy");
 
             app.UseAuthorization();
 
