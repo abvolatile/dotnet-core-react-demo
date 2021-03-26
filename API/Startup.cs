@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Middleware;
 //using API.Extensions;
 using Application.Activities;
 using Application.Utilities;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,7 +38,12 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddFluentValidation(config =>
+            {
+                //we're just telling it where our validators are coming from (just one of them - it will know where to look for the rest)
+                //we just need to specify a class that lives inside our Application project
+                config.RegisterValidatorsFromAssemblyContaining<Create>();
+            });
 
             //to clean this up a bit, we could use an Extension method (API > Extensions > ApplicationServiceExtensions)
             //we would replace everything below here (not the services.AddControllers()!) with:
@@ -71,9 +78,11 @@ namespace API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseMiddleware<ExceptionMiddleware>(); //our own exception handling "page" for both dev and prod
+
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }

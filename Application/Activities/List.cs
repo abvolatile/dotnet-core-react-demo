@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Utilities;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +15,9 @@ namespace Application.Activities
     public class List
     {
         //the way we use MediatR is to create a nested class (or classes) inside the List class (List.Query, List.Handler)
-        public class Query : IRequest<List<Activity>> { } //simply returning a list here - no need for props
+        public class Query : IRequest<Result<List<Activity>>> { } //simply returning a list here - no need for props
 
-        public class Handler : IRequestHandler<Query, List<Activity>>
+        public class Handler : IRequestHandler<Query, Result<List<Activity>>>
         {
             //we pass in a query and get a list of activities in return - we need access to our DataContext in here
             private readonly DataContext _context;
@@ -29,7 +30,7 @@ namespace Application.Activities
             }
 
             //this returns a list of activities, we have access to our query (and a cancellationToken - more later)
-            public async Task<List<Activity>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<List<Activity>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 //the cancellationToken gives us the ability to cancel a long-running request (user initiated)
                 //the try/catch is just for demonstration purposes - these requests are quick, so we need to fake a long one to cancel (in Postman)
@@ -47,7 +48,9 @@ namespace Application.Activities
                 //     _logger.LogInformation($"Task was cancelled: {ex}");
                 // }
 
-                return await _context.Activities.ToListAsync(cancellationToken);
+                var activities = await _context.Activities.ToListAsync(cancellationToken);
+
+                return Result<List<Activity>>.Success(activities);
             }
         }
     }
