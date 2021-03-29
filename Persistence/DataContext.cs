@@ -1,9 +1,11 @@
 using Domain;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence
 {
-    public class DataContext : DbContext
+    //we don't need to specify a new DbSet for AppUser if we use the IdentityDbContext<AppUser> instead of just DbContext (like we had before)
+    public class DataContext : IdentityDbContext<AppUser>
     {
         //basically our DbContext (DataContext) is an abstraction away from our Db - should be added in API > Startup > ConfigureServices
         public DataContext(DbContextOptions options) : base(options)

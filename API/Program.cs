@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection; //for CreateScope()
@@ -26,8 +28,9 @@ namespace API
             try
             {
                 var context = services.GetRequiredService<DataContext>(); //getting it as a service b/c we added it as a service in Startup.cs
+                var userMgr = services.GetRequiredService<UserManager<AppUser>>(); //just used to seed our db with fake users if there are none
                 await context.Database.MigrateAsync(); //hover over Migrate to see what it will do!
-                await Seed.SeedData(context);
+                await Seed.SeedData(context, userMgr);
             }
             catch (System.Exception ex)
             {

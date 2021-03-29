@@ -2,16 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Extensions;
 using API.Middleware;
 //using API.Extensions;
 using Application.Activities;
 using Application.Utilities;
 using FluentValidation.AspNetCore;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,16 +41,23 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddFluentValidation(config =>
+            services.AddControllers(opt =>
             {
-                //we're just telling it where our validators are coming from (just one of them - it will know where to look for the rest)
-                //we just need to specify a class that lives inside our Application project
-                config.RegisterValidatorsFromAssemblyContaining<Create>();
-            });
+                var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                opt.Filters.Add(new AuthorizeFilter(policy));
+                //this will ensure that every endpoint in our API requires authentication (instead of adding [Authorize] attributes on Controller actions individually)
+            })
+                .AddFluentValidation(config =>
+                {
+                    //we're just telling it where our validators are coming from (just one of them - it will know where to look for the rest)
+                    //we just need to specify a class that lives inside our Application project
+                    config.RegisterValidatorsFromAssemblyContaining<Create>();
+                });
 
             //to clean this up a bit, we could use an Extension method (API > Extensions > ApplicationServiceExtensions)
             //we would replace everything below here (not the services.AddControllers()!) with:
             //services.AddApplicationServices(_config);
+            //we're doing it with IdentityServices below!
 
             services.AddSwaggerGen(c =>
             {
@@ -73,6 +83,8 @@ namespace API
 
             services.AddMediatR(typeof(List.Handler).Assembly); //tells our app to use MediatR, and the rest tells MediatR where to find our handlers
             services.AddAutoMapper(typeof(MappingProfiles).Assembly); //a utility we can use to map properties from one object to another object
+
+            services.AddIdentityServices(_config);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -93,6 +105,8 @@ namespace API
 
             app.UseCors("CorsPolicy");
 
+            //authentication MUST go before authorization!
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
