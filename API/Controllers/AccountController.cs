@@ -47,11 +47,13 @@ namespace API.Controllers
         {
             if (await _userMgr.Users.AnyAsync(u => u.Email == registerDto.Email))
             {
-                return BadRequest("Email taken");
+                ModelState.AddModelError("email", "Email taken");
+                return ValidationProblem(); //this sends our error in the format we want for our UI ValidationErrors component
             }
             if (await _userMgr.Users.AnyAsync(u => u.UserName == registerDto.Username))
             {
-                return BadRequest("Username taken");
+                ModelState.AddModelError("username", "Username taken");
+                return ValidationProblem();
             }
 
             var user = new AppUser

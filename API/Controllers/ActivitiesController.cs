@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [AllowAnonymous] //TEMPORARY!!
     public class ActivitiesController : BaseApiController
     {
         //moving our context to a mediator (in Application > Activities > List), which we will add to our BaseApiController

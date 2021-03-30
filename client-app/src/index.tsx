@@ -18,7 +18,8 @@ ReactDOM.render(
   <StoreContext.Provider value={store}>
     <Router history={history}>
       <App />
-    </Router>,
+    </Router>
+    ,
   </StoreContext.Provider>,
   document.getElementById('root')
 );

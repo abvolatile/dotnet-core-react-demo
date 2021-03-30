@@ -3,29 +3,32 @@ import React from 'react';
 import { Form, Label, Select } from 'semantic-ui-react';
 
 interface Props {
-    placeholder: string;
-    name: string;
-    options: any;
-    label?: string;
+  placeholder: string;
+  name: string;
+  options: any;
+  label?: string;
 }
 
 export default function CustomSelect(props: Props) {
-    const [field, meta, helpers] = useField(props.name);
+  const [field, meta, helpers] = useField(props.name);
 
-    // the !! makes the meta.error field a boolean (it's either a string or undefined)
-    return (
-        <Form.Field error={meta.touched && !!meta.error}>
-            <label>{props.label}</label>
-            <Select clearable
-                options={props.options}
-                value={field.value || null}
-                onChange={(e, d) => helpers.setValue(d.value)}
-                onBlur={() => helpers.setTouched(true)}
-                placeholder={props.placeholder}
-            />
-            {meta.touched && meta.error ? (
-                <Label basic color='red'>{meta.error}</Label>
-            ) : null}
-        </Form.Field>
-    )
+  // the !! makes the meta.error field a boolean (it's either a string or undefined)
+  return (
+    <Form.Field error={meta.touched && !!meta.error}>
+      <label>{props.label}</label>
+      <Select
+        clearable
+        options={props.options}
+        value={field.value || null}
+        onChange={(e, d) => helpers.setValue(d.value)}
+        onBlur={() => helpers.setTouched(true)}
+        placeholder={props.placeholder}
+      />
+      {meta.touched && meta.error ? (
+        <Label basic color='red'>
+          {meta.error}
+        </Label>
+      ) : null}
+    </Form.Field>
+  );
 }

@@ -34,7 +34,7 @@ namespace API.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(7),
+                Expires = DateTime.Now.AddDays(7), //you wouldn't want a real token to be valid this long, fyi
                 SigningCredentials = creds
             };
 
