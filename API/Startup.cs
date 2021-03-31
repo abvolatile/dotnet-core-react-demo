@@ -6,8 +6,10 @@ using API.Extensions;
 using API.Middleware;
 //using API.Extensions;
 using Application.Activities;
+using Application.Interfaces;
 using Application.Utilities;
 using FluentValidation.AspNetCore;
+using Infrastructure.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -83,6 +85,8 @@ namespace API
 
             services.AddMediatR(typeof(List.Handler).Assembly); //tells our app to use MediatR, and the rest tells MediatR where to find our handlers
             services.AddAutoMapper(typeof(MappingProfiles).Assembly); //a utility we can use to map properties from one object to another object
+
+            services.AddScoped<IUserAccessor, UserAccessor>(); //make sure we can use our Infrastructure UserAccessor and interface in the Application
 
             services.AddIdentityServices(_config);
         }

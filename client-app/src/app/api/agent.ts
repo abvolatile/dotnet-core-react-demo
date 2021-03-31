@@ -21,7 +21,7 @@ axios.interceptors.request.use((config) => {
 
 axios.interceptors.response.use(
   async (response) => {
-    await sleep(1000); //faking our response time (but the overall interceptor is a good example if you need to do something btwn req and res)
+    await sleep(1000); //faking our response time (but the overall interceptor is a good example if you need to do something as response comes in)
     return response;
   },
   (error: AxiosError) => {
