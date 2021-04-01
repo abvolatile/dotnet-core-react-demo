@@ -12,7 +12,7 @@ import CustomTextArea from '../../../app/common/form/CustomTextArea';
 import CustomSelect from '../../../app/common/form/CustomSelect';
 import { categoryOptions } from '../../../app/common/options/categoryOptions';
 import CustomDatePicker from '../../../app/common/form/CustomDatePicker';
-import { Activity } from '../../../app/models/activity';
+import { ActivityFormValues } from '../../../app/models/activity';
 
 function ActivityForm() {
   const history = useHistory();
@@ -21,20 +21,13 @@ function ActivityForm() {
     loadActivity,
     createActivity,
     updateActivity,
-    loading,
     loadingInitial
   } = activityStore;
   const { id } = useParams<{ id: string }>();
 
-  const [activity, setActivity] = useState<Activity>({
-    id: '',
-    title: '',
-    description: '',
-    category: '',
-    date: null,
-    city: '',
-    venue: ''
-  });
+  const [activity, setActivity] = useState<ActivityFormValues>(
+    new ActivityFormValues()
+  );
 
   const validationSchema = Yup.object({
     title: Yup.string().required('Title is required'),
@@ -47,12 +40,14 @@ function ActivityForm() {
 
   useEffect(() => {
     if (id) {
-      loadActivity(id).then((activity) => setActivity(activity!)); //using the bang here because we know activity won't be undefined
+      loadActivity(id).then((activity) =>
+        setActivity(new ActivityFormValues(activity))
+      );
     }
   }, [id, loadActivity]); //we only execute the code in the effect if the dependencies have changed (prevents infinite rendering loops)
 
-  function handleFormSubmit(activity: Activity) {
-    if (activity.id.length === 0) {
+  function handleFormSubmit(activity: ActivityFormValues) {
+    if (!activity.id) {
       let newActivity = {
         ...activity,
         id: uuid()
@@ -106,7 +101,7 @@ function ActivityForm() {
             <CustomTextInput placeholder='City' name='city' />
             <CustomTextInput placeholder='Venue' name='venue' />
             <Button
-              loading={loading}
+              loading={isSubmitting}
               disabled={isSubmitting || !dirty || !isValid}
               floated='right'
               positive
