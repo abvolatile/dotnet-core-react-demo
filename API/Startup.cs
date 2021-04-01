@@ -9,6 +9,7 @@ using Application.Activities;
 using Application.Interfaces;
 using Application.Utilities;
 using FluentValidation.AspNetCore;
+using Infrastructure.Photos;
 using Infrastructure.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -87,6 +88,10 @@ namespace API
             services.AddAutoMapper(typeof(MappingProfiles).Assembly); //a utility we can use to map properties from one object to another object
 
             services.AddScoped<IUserAccessor, UserAccessor>(); //make sure we can use our Infrastructure UserAccessor and interface in the Application
+
+            services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+            services.Configure<CloudinarySettings>(_config.GetSection("Cloudinary"));
+            //this is how we bind our Cloudinary config in appsettings.json to our Infrastructure>CloudinarySettings class props
 
             services.AddIdentityServices(_config);
         }

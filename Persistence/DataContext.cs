@@ -14,6 +14,7 @@ namespace Persistence
 
         public DbSet<Activity> Activities { get; set; } //reflects the name of our Db table for the domain entity Activity
         public DbSet<ActivityAttendee> ActivityAttendees { get; set; }
+        public DbSet<Photo> Photos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         { //overriding the OnModelCreating method so we can use our own custom model for ActivityAttendees (because we wanted extra props)
