@@ -2,25 +2,26 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 import { history } from '../..';
 import { Activity, ActivityFormValues } from '../models/activity';
+import { Photo, Profile } from '../models/profile';
 import { User, UserFormValues } from '../models/user';
 import { store } from '../stores/store';
 
 const sleep = (delay: number) => {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     setTimeout(resolve, delay);
   });
 }; //this is just to fake a longer response time
 
 axios.defaults.baseURL = 'http://localhost:5000/api';
 
-axios.interceptors.request.use((config) => {
+axios.interceptors.request.use(config => {
   const token = store.commonStore.token;
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 }); //this makes sure we send the token with every request when we already have it!
 
 axios.interceptors.response.use(
-  async (response) => {
+  async response => {
     await sleep(1000); //faking our response time (but the overall interceptor is a good example if you need to do something as response comes in)
     return response;
   },
@@ -75,7 +76,8 @@ const requests = {
 const Activities = {
   list: () => requests.get<Activity[]>('/activities'),
   details: (id: string) => requests.get<Activity>(`/activities/${id}`),
-  create: (activity: ActivityFormValues) => requests.post<void>('/activities', activity),
+  create: (activity: ActivityFormValues) =>
+    requests.post<void>('/activities', activity),
   update: (activity: ActivityFormValues) =>
     requests.put<void>(`/activities/${activity.id}`, activity),
   delete: (id: string) => requests.delete<void>(`/activities/${id}`),
@@ -89,9 +91,23 @@ const Account = {
     requests.post<User>('/account/register', user)
 };
 
+const Profiles = {
+  get: (username: string) => requests.get<Profile>(`/profiles/${username}`),
+  uploadPhoto: (file: Blob) => {
+    let formData = new FormData();
+    formData.append('File', file);
+    return axios.post<Photo>('photos', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  setMainPhoto: (id: string) => requests.post(`/photos/${id}/setMain`, {}),
+  deletePhoto: (id: string) => requests.delete(`/photos/${id}`)
+};
+
 const agent = {
   Activities,
-  Account
+  Account,
+  Profiles
 };
 
 export default agent;
